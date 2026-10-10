@@ -2,20 +2,20 @@
 
 Web app pemilihan Ketua OSIS berbasis Google Spreadsheet + Apps Script.
 
-| Halaman | URL | Fungsi |
-|---|---|---|
-| Pemilihan (siswa) | `URL_WEB_APP` | Login NISN + password → pilih kandidat |
+| Halaman           | URL                          | Fungsi                                              |
+| ----------------- | ---------------------------- | --------------------------------------------------- |
+| Pemilihan (siswa) | `URL_WEB_APP`                | Login NISN + password → pilih kandidat              |
 | Dashboard (admin) | `URL_WEB_APP?page=dashboard` | Pantau hasil secara real-time, buka/tutup pemilihan |
 
 ## File
 
-| File | Keterangan |
-|---|---|
-| `Code.gs` | Backend (login, simpan suara, hitung hasil, setup sheet) |
-| `Index.html` | Halaman login & pemilihan siswa |
-| `Dashboard.html` | Dashboard admin (grafik, statistik, partisipasi per kelas) |
-| `Styles.html` | CSS bersama |
-| `appsscript.json` | Manifest (opsional, hanya jika memakai `clasp`) |
+| File              | Keterangan                                                 |
+| ----------------- | ---------------------------------------------------------- |
+| `Code.gs`         | Backend (login, simpan suara, hitung hasil, setup sheet)   |
+| `Index.html`      | Halaman login & pemilihan siswa                            |
+| `Dashboard.html`  | Dashboard admin (grafik, statistik, partisipasi per kelas) |
+| `Styles.html`     | CSS bersama                                                |
+| `appsscript.json` | Manifest (opsional, hanya jika memakai `clasp`)            |
 
 ## Cara Instalasi
 
@@ -30,12 +30,12 @@ Web app pemilihan Ketua OSIS berbasis Google Spreadsheet + Apps Script.
    - **Pemilih** → `NISN | Password | Nama | Kelas` (kolom `Status` & `Waktu Memilih` dibiarkan kosong, diisi otomatis).
    - **Kandidat** → `No Urut | Nama Ketua | Nama Wakil | Visi | Misi | Foto (URL)`.
      Misi bisa ditulis per baris (Alt+Enter / Ctrl+Enter di dalam sel).
-     Foto boleh link Google Drive (set berbagi: *Siapa saja yang memiliki link*).
+     Foto boleh link Google Drive (set berbagi: _Siapa saja yang memiliki link_).
    - **Admin** → username & password panitia. **Segera ganti `admin / admin123`!**
    - **Pengaturan** → `Judul`, `Nama Sekolah`, `Status Pemilihan` (`BUKA` / `TUTUP`).
 6. Klik **Deploy → New deployment → ⚙️ Web app**:
-   - *Execute as*: **Me**
-   - *Who has access*: **Anyone**
+   - _Execute as_: **Me**
+   - _Who has access_: **Anyone**
    - Klik **Deploy**, salin URL-nya.
 7. Bagikan URL ke siswa. Dashboard: tambahkan `?page=dashboard` di akhir URL.
 
@@ -44,12 +44,14 @@ Web app pemilihan Ketua OSIS berbasis Google Spreadsheet + Apps Script.
 ## Fitur
 
 **Siswa**
+
 - Login dengan NISN + password dari sheet `Pemilih` (nol di depan NISN tetap dikenali).
 - Hanya bisa memilih **satu kali**; status otomatis tercatat `SUDAH`.
 - Konfirmasi sebelum mengirim suara, lalu otomatis kembali ke halaman login (cocok untuk 1 perangkat bergantian di bilik suara).
 - Auto-logout setelah 3 menit tanpa aktivitas.
 
 **Admin / Dashboard**
+
 - Total pemilih, sudah/belum memilih, persentase partisipasi.
 - Grafik batang & donat perolehan suara, peringkat kandidat.
 - Partisipasi per kelas.
@@ -57,6 +59,7 @@ Web app pemilihan Ketua OSIS berbasis Google Spreadsheet + Apps Script.
 - Auto-refresh setiap 10 detik.
 
 **Keamanan**
+
 - **Suara rahasia**: sheet `Suara` hanya menyimpan kode acak + nomor urut (tanpa NISN), dan disisipkan di baris acak sehingga tidak bisa dicocokkan dengan urutan waktu memilih.
 - `LockService` mencegah suara ganda saat banyak siswa memilih bersamaan.
 - Sesi berbasis token (siswa 30 menit, admin 6 jam).
@@ -66,12 +69,13 @@ Web app pemilihan Ketua OSIS berbasis Google Spreadsheet + Apps Script.
 ## Menu Spreadsheet
 
 Setelah spreadsheet dibuka ulang, muncul menu **🗳️ E-Voting OSIS**:
+
 - **Setup / Buat Sheet** – membuat sheet yang belum ada.
 - **Reset Semua Suara** – menghapus seluruh suara & status pemilih (untuk uji coba sebelum hari H).
 
 ## Tips
 
-- Format kolom **NISN** dan **Password** sebagai *Plain text* (Format → Number → Plain text) — sudah otomatis jika memakai `setupSpreadsheet`.
+- Format kolom **NISN** dan **Password** sebagai _Plain text_ (Format → Number → Plain text) — sudah otomatis jika memakai `setupSpreadsheet`.
 - Lakukan uji coba dengan beberapa akun, lalu jalankan **Reset Semua Suara** sebelum pemilihan dimulai.
 - Lindungi sheet `Suara` dan `Pemilih` (Data → Protect sheets and ranges) agar tidak diubah manual.
 - Apps Script membatasi sekitar 30 eksekusi bersamaan; untuk sekolah besar, atur jadwal memilih per kelas.

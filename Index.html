@@ -1,189 +1,417 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
-<head>
-  <base target="_top">
-  <meta charset="utf-8">
-  <?!= include('Styles'); ?>
-  <style>
-    .voter-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 24px; }
-    .voter-bar h2 { font-size: 20px; }
-    .voter-bar p { font-size: 14px; color: var(--muted); }
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
-    .cand { background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; display: flex; flex-direction: column;
-      border: 3px solid transparent; transition: transform .2s, border-color .2s; }
-    .cand:hover { transform: translateY(-4px); border-color: #bfdbfe; }
-    .cand-photo { position: relative; aspect-ratio: 4 / 3; background: linear-gradient(135deg, #dbeafe, #eff6ff); display: grid; place-items: center;
-      font-size: 56px; font-weight: 700; color: var(--primary); overflow: hidden; }
-    .cand-photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-    .cand-no { position: absolute; top: 12px; left: 12px; z-index: 1; width: 46px; height: 46px; border-radius: 50%; background: var(--accent);
-      color: #fff; display: grid; place-items: center; font-weight: 700; font-size: 20px; box-shadow: 0 4px 12px rgba(0,0,0,.2); }
-    .cand-body { padding: 18px; flex: 1; display: flex; flex-direction: column; }
-    .cand-body h3 { font-size: 18px; line-height: 1.3; }
-    .cand-body .wakil { font-size: 13px; color: var(--muted); margin-top: 2px; }
-    .cand-body details { margin: 12px 0 16px; font-size: 13px; }
-    .cand-body summary { cursor: pointer; color: var(--primary); font-weight: 500; }
-    .cand-body .vm { margin-top: 8px; }
-    .cand-body .vm b { display: block; margin-top: 6px; }
-    .cand-body ul { padding-left: 18px; }
-    .cand-body .btn { margin-top: auto; }
-    .confirm-photo { width: 110px; height: 110px; margin: 0 auto 14px; border-radius: 50%; overflow: hidden; position: relative;
-      background: linear-gradient(135deg, #dbeafe, #eff6ff); display: grid; place-items: center; font-size: 40px; font-weight: 700; color: var(--primary); }
-    .confirm-photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-    .done-icon { width: 96px; height: 96px; margin: 0 auto 18px; border-radius: 50%; background: #dcfce7; color: var(--success);
-      display: grid; place-items: center; font-size: 52px; animation: pop .4s; }
-  </style>
-</head>
-<body>
-  <header class="topbar">
-    <div class="brand">
-      <div class="brand-logo">🗳️</div>
-      <div>
-        <h1><?= judul ?></h1>
-        <p><?= sekolah ?></p>
-      </div>
-    </div>
-    <div class="topbar-actions">
-      <button id="btn-logout" class="btn btn-light btn-sm hidden" type="button">Keluar</button>
-    </div>
-  </header>
-
-  <!-- ============ LOGIN ============ -->
-  <section id="view-login" class="auth-wrap">
-    <div class="card auth-card">
-      <div class="auth-icon">🔐</div>
-      <h2>Login Pemilih</h2>
-      <p class="sub">Masukkan NISN dan password yang diberikan panitia</p>
-      <div id="login-alert" class="alert alert-error hidden"></div>
-      <form id="login-form" autocomplete="off">
-        <div class="field">
-          <label for="nisn">NISN</label>
-          <input id="nisn" class="input" type="text" inputmode="numeric" placeholder="Contoh: 0012345678" required>
+  <head>
+    <base target="_top" />
+    <meta charset="utf-8" />
+    <?!= include('Styles'); ?>
+    <style>
+      .voter-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 24px;
+      }
+      .voter-bar h2 {
+        font-size: 20px;
+      }
+      .voter-bar p {
+        font-size: 14px;
+        color: var(--muted);
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 20px;
+      }
+      .cand {
+        background: #fff;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        border: 3px solid transparent;
+        transition:
+          transform 0.2s,
+          border-color 0.2s;
+      }
+      .cand:hover {
+        transform: translateY(-4px);
+        border-color: #bfdbfe;
+      }
+      .cand-photo {
+        position: relative;
+        aspect-ratio: 4 / 3;
+        background: linear-gradient(135deg, #dbeafe, #eff6ff);
+        display: grid;
+        place-items: center;
+        font-size: 56px;
+        font-weight: 700;
+        color: var(--primary);
+        overflow: hidden;
+      }
+      .cand-photo img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .cand-no {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        z-index: 1;
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        background: var(--accent);
+        color: #fff;
+        display: grid;
+        place-items: center;
+        font-weight: 700;
+        font-size: 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      }
+      .cand-body {
+        padding: 18px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+      .cand-body h3 {
+        font-size: 18px;
+        line-height: 1.3;
+      }
+      .cand-body .wakil {
+        font-size: 13px;
+        color: var(--muted);
+        margin-top: 2px;
+      }
+      .cand-body details {
+        margin: 12px 0 16px;
+        font-size: 13px;
+      }
+      .cand-body summary {
+        cursor: pointer;
+        color: var(--primary);
+        font-weight: 500;
+      }
+      .cand-body .vm {
+        margin-top: 8px;
+      }
+      .cand-body .vm b {
+        display: block;
+        margin-top: 6px;
+      }
+      .cand-body ul {
+        padding-left: 18px;
+      }
+      .cand-body .btn {
+        margin-top: auto;
+      }
+      .confirm-photo {
+        width: 110px;
+        height: 110px;
+        margin: 0 auto 14px;
+        border-radius: 50%;
+        overflow: hidden;
+        position: relative;
+        background: linear-gradient(135deg, #dbeafe, #eff6ff);
+        display: grid;
+        place-items: center;
+        font-size: 40px;
+        font-weight: 700;
+        color: var(--primary);
+      }
+      .confirm-photo img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .done-icon {
+        width: 96px;
+        height: 96px;
+        margin: 0 auto 18px;
+        border-radius: 50%;
+        background: #dcfce7;
+        color: var(--success);
+        display: grid;
+        place-items: center;
+        font-size: 52px;
+        animation: pop 0.4s;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-logo">🗳️</div>
+        <div>
+          <h1><?= judul ?></h1>
+          <p><?= sekolah ?></p>
         </div>
-        <div class="field">
-          <label for="password">Password</label>
-          <div class="input-wrap">
-            <input id="password" class="input" type="password" placeholder="Masukkan password" required>
-            <button type="button" class="toggle-pass" data-target="password">Lihat</button>
+      </div>
+      <div class="topbar-actions">
+        <button
+          id="btn-logout"
+          class="btn btn-light btn-sm hidden"
+          type="button"
+        >
+          Keluar
+        </button>
+      </div>
+    </header>
+
+    <!-- ============ LOGIN ============ -->
+    <section id="view-login" class="auth-wrap">
+      <div class="card auth-card">
+        <div class="auth-icon">🔐</div>
+        <h2>Login Pemilih</h2>
+        <p class="sub">Masukkan NISN dan password yang diberikan panitia</p>
+        <div id="login-alert" class="alert alert-error hidden"></div>
+        <form id="login-form" autocomplete="off">
+          <div class="field">
+            <label for="nisn">NISN</label>
+            <input
+              id="nisn"
+              class="input"
+              type="text"
+              inputmode="numeric"
+              placeholder="Contoh: 0012345678"
+              required
+            />
           </div>
+          <div class="field">
+            <label for="password">Password</label>
+            <div class="input-wrap">
+              <input
+                id="password"
+                class="input"
+                type="password"
+                placeholder="Masukkan password"
+                required
+              />
+              <button type="button" class="toggle-pass" data-target="password">
+                Lihat
+              </button>
+            </div>
+          </div>
+          <button
+            id="btn-login"
+            class="btn btn-primary btn-block"
+            type="submit"
+          >
+            Masuk
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ============ PEMILIHAN ============ -->
+    <section id="view-vote" class="container hidden">
+      <div class="voter-bar">
+        <div>
+          <h2>Halo, <span id="voter-name"></span> 👋</h2>
+          <p>
+            Kelas <span id="voter-class"></span> · Silakan pilih
+            <b>satu</b> pasangan calon. Pilihan tidak dapat diubah.
+          </p>
         </div>
-        <button id="btn-login" class="btn btn-primary btn-block" type="submit">Masuk</button>
-      </form>
-    </div>
-  </section>
+      </div>
+      <div id="cand-grid" class="grid"></div>
+    </section>
 
-  <!-- ============ PEMILIHAN ============ -->
-  <section id="view-vote" class="container hidden">
-    <div class="voter-bar">
-      <div>
-        <h2>Halo, <span id="voter-name"></span> 👋</h2>
-        <p>Kelas <span id="voter-class"></span> · Silakan pilih <b>satu</b> pasangan calon. Pilihan tidak dapat diubah.</p>
+    <!-- ============ SELESAI ============ -->
+    <section id="view-done" class="auth-wrap hidden">
+      <div class="card auth-card text-center">
+        <div class="done-icon">✓</div>
+        <h2>Terima Kasih!</h2>
+        <p class="sub" style="margin-bottom: 8px">
+          Suara Anda telah berhasil disimpan secara rahasia.
+        </p>
+        <p class="muted" style="font-size: 13px">
+          Kembali ke halaman login dalam <b id="countdown">5</b> detik…
+        </p>
+        <button
+          id="btn-back"
+          class="btn btn-outline btn-block"
+          style="margin-top: 20px"
+          type="button"
+        >
+          Kembali Sekarang
+        </button>
+      </div>
+    </section>
+
+    <!-- ============ MODAL KONFIRMASI ============ -->
+    <div id="modal" class="modal-backdrop hidden">
+      <div class="modal">
+        <div id="confirm-photo" class="confirm-photo"></div>
+        <h3>Konfirmasi Pilihan</h3>
+        <p>
+          Anda yakin memilih <b id="confirm-name"></b>?<br />Pilihan
+          <b>tidak dapat diubah</b> setelah dikirim.
+        </p>
+        <div id="modal-alert" class="alert alert-error hidden"></div>
+        <div class="modal-actions">
+          <button id="btn-cancel" class="btn btn-outline" type="button">
+            Batal
+          </button>
+          <button id="btn-confirm" class="btn btn-success" type="button">
+            Ya, Pilih
+          </button>
+        </div>
       </div>
     </div>
-    <div id="cand-grid" class="grid"></div>
-  </section>
 
-  <!-- ============ SELESAI ============ -->
-  <section id="view-done" class="auth-wrap hidden">
-    <div class="card auth-card text-center">
-      <div class="done-icon">✓</div>
-      <h2>Terima Kasih!</h2>
-      <p class="sub" style="margin-bottom:8px">Suara Anda telah berhasil disimpan secara rahasia.</p>
-      <p class="muted" style="font-size:13px">Kembali ke halaman login dalam <b id="countdown">5</b> detik…</p>
-      <button id="btn-back" class="btn btn-outline btn-block" style="margin-top:20px" type="button">Kembali Sekarang</button>
-    </div>
-  </section>
+    <footer>© <?= sekolah ?> · E-Voting OSIS</footer>
+    <footer>
+      © <?= sekolah ?> · E-Voting OSIS · Powered by
+      <strong style="color: var(--primary, #1e40af)">Guru Techies</strong>
+    </footer>
 
-  <!-- ============ MODAL KONFIRMASI ============ -->
-  <div id="modal" class="modal-backdrop hidden">
-    <div class="modal">
-      <div id="confirm-photo" class="confirm-photo"></div>
-      <h3>Konfirmasi Pilihan</h3>
-      <p>Anda yakin memilih <b id="confirm-name"></b>?<br>Pilihan <b>tidak dapat diubah</b> setelah dikirim.</p>
-      <div id="modal-alert" class="alert alert-error hidden"></div>
-      <div class="modal-actions">
-        <button id="btn-cancel" class="btn btn-outline" type="button">Batal</button>
-        <button id="btn-confirm" class="btn btn-success" type="button">Ya, Pilih</button>
-      </div>
-    </div>
-  </div>
+    <script>
+      const IDLE_LIMIT_MS = 3 * 60 * 1000; // logout otomatis jika tidak ada aktivitas 3 menit
+      const state = {
+        token: null,
+        kandidat: [],
+        selected: null,
+        idleTimer: null,
+        countdownTimer: null,
+      };
+      const $ = (id) => document.getElementById(id);
 
-  <footer>© <?= sekolah ?> · E-Voting OSIS</footer>
+      function esc(s) {
+        return String(s == null ? "" : s).replace(
+          /[&<>"']/g,
+          (c) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            })[c],
+        );
+      }
+      function initials(name) {
+        return esc(
+          String(name)
+            .split(/\s+/)
+            .filter(Boolean)
+            .slice(0, 2)
+            .map((w) => w[0])
+            .join("")
+            .toUpperCase(),
+        );
+      }
+      function photoHtml(k) {
+        return (
+          initials(k.ketua) +
+          (k.foto
+            ? `<img src="${esc(k.foto)}" alt="" referrerpolicy="no-referrer" onerror="this.remove()">`
+            : "")
+        );
+      }
+      function listHtml(text) {
+        const items = String(text || "")
+          .split(/\n+/)
+          .map((s) => s.replace(/^\s*[-•\d.)]+\s*/, "").trim())
+          .filter(Boolean);
+        return items.length
+          ? "<ul>" + items.map((i) => `<li>${esc(i)}</li>`).join("") + "</ul>"
+          : '<p class="muted">-</p>';
+      }
+      function call(fn, ...args) {
+        return new Promise((resolve, reject) => {
+          google.script.run
+            .withSuccessHandler(resolve)
+            .withFailureHandler(reject)
+            [fn](...args);
+        });
+      }
+      function show(view) {
+        ["view-login", "view-vote", "view-done"].forEach((v) =>
+          $(v).classList.toggle("hidden", v !== view),
+        );
+        $("btn-logout").classList.toggle("hidden", view !== "view-vote");
+        window.scrollTo(0, 0);
+      }
+      function setLoading(btn, on, label) {
+        btn.disabled = on;
+        if (on) {
+          btn.dataset.label = btn.innerHTML;
+          btn.innerHTML =
+            '<span class="spinner"></span> ' + (label || "Memproses…");
+        } else if (btn.dataset.label) btn.innerHTML = btn.dataset.label;
+      }
+      function showAlert(el, msg) {
+        el.textContent = msg;
+        el.classList.remove("hidden");
+      }
+      function hideAlert(el) {
+        el.classList.add("hidden");
+      }
 
-  <script>
-    const IDLE_LIMIT_MS = 3 * 60 * 1000; // logout otomatis jika tidak ada aktivitas 3 menit
-    const state = { token: null, kandidat: [], selected: null, idleTimer: null, countdownTimer: null };
-    const $ = (id) => document.getElementById(id);
-
-    function esc(s) {
-      return String(s == null ? '' : s).replace(/[&<>"']/g, (c) =>
-        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-    }
-    function initials(name) {
-      return esc(String(name).split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase());
-    }
-    function photoHtml(k) {
-      return initials(k.ketua) + (k.foto ? `<img src="${esc(k.foto)}" alt="" referrerpolicy="no-referrer" onerror="this.remove()">` : '');
-    }
-    function listHtml(text) {
-      const items = String(text || '').split(/\n+/).map((s) => s.replace(/^\s*[-•\d.)]+\s*/, '').trim()).filter(Boolean);
-      return items.length ? '<ul>' + items.map((i) => `<li>${esc(i)}</li>`).join('') + '</ul>' : '<p class="muted">-</p>';
-    }
-    function call(fn, ...args) {
-      return new Promise((resolve, reject) => {
-        google.script.run.withSuccessHandler(resolve).withFailureHandler(reject)[fn](...args);
+      /* ---------- Login ---------- */
+      $("login-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        hideAlert($("login-alert"));
+        const btn = $("btn-login");
+        setLoading(btn, true, "Memeriksa…");
+        try {
+          const r = await call(
+            "loginPemilih",
+            $("nisn").value,
+            $("password").value,
+          );
+          if (!r.ok) {
+            showAlert($("login-alert"), r.message);
+            return;
+          }
+          state.token = r.token;
+          state.kandidat = r.kandidat || [];
+          $("voter-name").textContent = r.nama;
+          $("voter-class").textContent = r.kelas || "-";
+          renderKandidat();
+          show("view-vote");
+          resetIdle();
+        } catch (err) {
+          showAlert(
+            $("login-alert"),
+            "Gagal terhubung ke server. " +
+              (err && err.message ? err.message : err),
+          );
+        } finally {
+          setLoading(btn, false);
+        }
       });
-    }
-    function show(view) {
-      ['view-login', 'view-vote', 'view-done'].forEach((v) => $(v).classList.toggle('hidden', v !== view));
-      $('btn-logout').classList.toggle('hidden', view !== 'view-vote');
-      window.scrollTo(0, 0);
-    }
-    function setLoading(btn, on, label) {
-      btn.disabled = on;
-      if (on) { btn.dataset.label = btn.innerHTML; btn.innerHTML = '<span class="spinner"></span> ' + (label || 'Memproses…'); }
-      else if (btn.dataset.label) btn.innerHTML = btn.dataset.label;
-    }
-    function showAlert(el, msg) { el.textContent = msg; el.classList.remove('hidden'); }
-    function hideAlert(el) { el.classList.add('hidden'); }
 
-    /* ---------- Login ---------- */
-    $('login-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      hideAlert($('login-alert'));
-      const btn = $('btn-login');
-      setLoading(btn, true, 'Memeriksa…');
-      try {
-        const r = await call('loginPemilih', $('nisn').value, $('password').value);
-        if (!r.ok) { showAlert($('login-alert'), r.message); return; }
-        state.token = r.token;
-        state.kandidat = r.kandidat || [];
-        $('voter-name').textContent = r.nama;
-        $('voter-class').textContent = r.kelas || '-';
-        renderKandidat();
-        show('view-vote');
-        resetIdle();
-      } catch (err) {
-        showAlert($('login-alert'), 'Gagal terhubung ke server. ' + (err && err.message ? err.message : err));
-      } finally {
-        setLoading(btn, false);
-      }
-    });
+      document.querySelectorAll(".toggle-pass").forEach((b) =>
+        b.addEventListener("click", () => {
+          const input = $(b.dataset.target);
+          const hidden = input.type === "password";
+          input.type = hidden ? "text" : "password";
+          b.textContent = hidden ? "Sembunyikan" : "Lihat";
+        }),
+      );
 
-    document.querySelectorAll('.toggle-pass').forEach((b) => b.addEventListener('click', () => {
-      const input = $(b.dataset.target);
-      const hidden = input.type === 'password';
-      input.type = hidden ? 'text' : 'password';
-      b.textContent = hidden ? 'Sembunyikan' : 'Lihat';
-    }));
-
-    /* ---------- Kandidat ---------- */
-    function renderKandidat() {
-      const grid = $('cand-grid');
-      if (!state.kandidat.length) {
-        grid.innerHTML = '<div class="card text-center muted">Belum ada data kandidat.</div>';
-        return;
-      }
-      grid.innerHTML = state.kandidat.map((k) => `
+      /* ---------- Kandidat ---------- */
+      function renderKandidat() {
+        const grid = $("cand-grid");
+        if (!state.kandidat.length) {
+          grid.innerHTML =
+            '<div class="card text-center muted">Belum ada data kandidat.</div>';
+          return;
+        }
+        grid.innerHTML = state.kandidat
+          .map(
+            (k) => `
         <article class="cand">
           <div class="cand-photo">
             <div class="cand-no">${esc(k.no)}</div>
@@ -191,90 +419,116 @@
           </div>
           <div class="cand-body">
             <h3>${esc(k.ketua)}</h3>
-            ${k.wakil ? `<div class="wakil">Wakil: ${esc(k.wakil)}</div>` : ''}
+            ${k.wakil ? `<div class="wakil">Wakil: ${esc(k.wakil)}</div>` : ""}
             <details>
               <summary>Lihat Visi &amp; Misi</summary>
               <div class="vm">
-                <b>Visi</b><p>${esc(k.visi) || '-'}</p>
+                <b>Visi</b><p>${esc(k.visi) || "-"}</p>
                 <b>Misi</b>${listHtml(k.misi)}
               </div>
             </details>
             <button class="btn btn-accent btn-block" type="button" data-no="${esc(k.no)}">Pilih No. ${esc(k.no)}</button>
           </div>
-        </article>`).join('');
-      grid.querySelectorAll('button[data-no]').forEach((b) => b.addEventListener('click', () => openConfirm(b.dataset.no)));
-    }
-
-    function openConfirm(no) {
-      const k = state.kandidat.find((x) => x.no === no);
-      if (!k) return;
-      state.selected = k;
-      $('confirm-photo').innerHTML = photoHtml(k);
-      $('confirm-name').textContent = `No. ${k.no} – ${k.ketua}${k.wakil ? ' & ' + k.wakil : ''}`;
-      hideAlert($('modal-alert'));
-      $('modal').classList.remove('hidden');
-    }
-    function closeConfirm() { $('modal').classList.add('hidden'); state.selected = null; }
-
-    $('btn-cancel').addEventListener('click', closeConfirm);
-    $('btn-confirm').addEventListener('click', async () => {
-      if (!state.selected) return;
-      const btn = $('btn-confirm');
-      setLoading(btn, true, 'Mengirim…');
-      $('btn-cancel').disabled = true;
-      try {
-        const r = await call('submitVote', state.token, state.selected.no);
-        if (!r.ok) {
-          if (r.expired) { closeConfirm(); resetToLogin(r.message); return; }
-          showAlert($('modal-alert'), r.message);
-          return;
-        }
-        closeConfirm();
-        state.token = null;
-        clearTimeout(state.idleTimer);
-        show('view-done');
-        startCountdown();
-      } catch (err) {
-        showAlert($('modal-alert'), 'Gagal mengirim suara. ' + (err && err.message ? err.message : err));
-      } finally {
-        setLoading(btn, false);
-        $('btn-cancel').disabled = false;
+        </article>`,
+          )
+          .join("");
+        grid
+          .querySelectorAll("button[data-no]")
+          .forEach((b) =>
+            b.addEventListener("click", () => openConfirm(b.dataset.no)),
+          );
       }
-    });
 
-    /* ---------- Logout / reset ---------- */
-    function resetToLogin(message) {
-      if (state.token) call('logoutPemilih', state.token).catch(() => {});
-      state.token = null; state.kandidat = []; state.selected = null;
-      clearTimeout(state.idleTimer);
-      clearInterval(state.countdownTimer);
-      $('login-form').reset();
-      $('password').type = 'password';
-      $('cand-grid').innerHTML = '';
-      show('view-login');
-      if (message) showAlert($('login-alert'), message); else hideAlert($('login-alert'));
-      $('nisn').focus();
-    }
-    $('btn-logout').addEventListener('click', () => resetToLogin());
-    $('btn-back').addEventListener('click', () => resetToLogin());
+      function openConfirm(no) {
+        const k = state.kandidat.find((x) => x.no === no);
+        if (!k) return;
+        state.selected = k;
+        $("confirm-photo").innerHTML = photoHtml(k);
+        $("confirm-name").textContent =
+          `No. ${k.no} – ${k.ketua}${k.wakil ? " & " + k.wakil : ""}`;
+        hideAlert($("modal-alert"));
+        $("modal").classList.remove("hidden");
+      }
+      function closeConfirm() {
+        $("modal").classList.add("hidden");
+        state.selected = null;
+      }
 
-    function startCountdown() {
-      let n = 5;
-      $('countdown').textContent = n;
-      clearInterval(state.countdownTimer);
-      state.countdownTimer = setInterval(() => {
-        n -= 1;
-        $('countdown').textContent = n;
-        if (n <= 0) resetToLogin();
-      }, 1000);
-    }
+      $("btn-cancel").addEventListener("click", closeConfirm);
+      $("btn-confirm").addEventListener("click", async () => {
+        if (!state.selected) return;
+        const btn = $("btn-confirm");
+        setLoading(btn, true, "Mengirim…");
+        $("btn-cancel").disabled = true;
+        try {
+          const r = await call("submitVote", state.token, state.selected.no);
+          if (!r.ok) {
+            if (r.expired) {
+              closeConfirm();
+              resetToLogin(r.message);
+              return;
+            }
+            showAlert($("modal-alert"), r.message);
+            return;
+          }
+          closeConfirm();
+          state.token = null;
+          clearTimeout(state.idleTimer);
+          show("view-done");
+          startCountdown();
+        } catch (err) {
+          showAlert(
+            $("modal-alert"),
+            "Gagal mengirim suara. " + (err && err.message ? err.message : err),
+          );
+        } finally {
+          setLoading(btn, false);
+          $("btn-cancel").disabled = false;
+        }
+      });
 
-    function resetIdle() {
-      clearTimeout(state.idleTimer);
-      if (!state.token) return;
-      state.idleTimer = setTimeout(() => resetToLogin('Anda otomatis keluar karena tidak ada aktivitas.'), IDLE_LIMIT_MS);
-    }
-    ['click', 'keydown', 'touchstart', 'scroll'].forEach((ev) => document.addEventListener(ev, resetIdle, { passive: true }));
-  </script>
-</body>
+      /* ---------- Logout / reset ---------- */
+      function resetToLogin(message) {
+        if (state.token) call("logoutPemilih", state.token).catch(() => {});
+        state.token = null;
+        state.kandidat = [];
+        state.selected = null;
+        clearTimeout(state.idleTimer);
+        clearInterval(state.countdownTimer);
+        $("login-form").reset();
+        $("password").type = "password";
+        $("cand-grid").innerHTML = "";
+        show("view-login");
+        if (message) showAlert($("login-alert"), message);
+        else hideAlert($("login-alert"));
+        $("nisn").focus();
+      }
+      $("btn-logout").addEventListener("click", () => resetToLogin());
+      $("btn-back").addEventListener("click", () => resetToLogin());
+
+      function startCountdown() {
+        let n = 5;
+        $("countdown").textContent = n;
+        clearInterval(state.countdownTimer);
+        state.countdownTimer = setInterval(() => {
+          n -= 1;
+          $("countdown").textContent = n;
+          if (n <= 0) resetToLogin();
+        }, 1000);
+      }
+
+      function resetIdle() {
+        clearTimeout(state.idleTimer);
+        if (!state.token) return;
+        state.idleTimer = setTimeout(
+          () =>
+            resetToLogin("Anda otomatis keluar karena tidak ada aktivitas."),
+          IDLE_LIMIT_MS,
+        );
+      }
+      ["click", "keydown", "touchstart", "scroll"].forEach((ev) =>
+        document.addEventListener(ev, resetIdle, { passive: true }),
+      );
+    </script>
+  </body>
 </html>
